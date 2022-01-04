@@ -14,19 +14,19 @@ endif
 
 ###################################################################################################
 # 目录设置
-# 中间文件缓存文件夹
-TMP_PATH = $(abspath .)/tmp
 # 当前路径
 PWD_PATH = $(abspath .)
 
 ###################################################################################################
-# 源文件.c
-SRC := ${PWD_PATH}/*.c
-# 展开*匹配，获取所有源文件完整路径
-SRC := $(wildcard ${SRC})
-OBJ := $(patsubst ${PWD_PATH}/%.c,${TMP_PATH}/%.o,${SRC})
+# 目标文件
+TARGET = demo
+SRCS = demo.c \
+       ${PWD_PATH}/singly_linked_list/singly_linked_list.c \
+	   ${PWD_PATH}/doubly_linked_list/doubly_linked_list.c
 
-TARGET := $(patsubst ${PWD_PATH}/%.c,${PWD_PATH}/%.out,${SRC})
+INC = -I${PWD_PATH}/singly_linked_list -I${PWD_PATH}/doubly_linked_list
+
+OBJS = $(SRCS:.c=.o)
 
 ###################################################################################################
 # 编译选项
@@ -41,19 +41,32 @@ endif
 
 all:${TARGET}
 
-# ${PWD_PATH}/%.out:${TMP_PATH}/%.o
-${TARGET}:${OBJ}
-	@echo "\033[32;32m[Linking]\033[0m $@"
-	${QUIET}${CC} $< -o $@ ${CFLAGS}
+# ${TARGET}:${OBJS}
+# 	@echo "\033[32;32m[Linking]\033[0m $@"
+# 	@echo TARGET:$@
+# 	@echo OBJECTS:$^
+# 	#${QUIET}${CC} $^ -o $@ ${CFLAGS}
+# 	$(CC) -o $@ $^
 
-# ${TMP_PATH}/%.o:${PWD_PATH}/%.c
-${OBJ}:${SRC}
-	@echo "\033[32;35m[Compiling]\033[0m $@"
-	@mkdir $(dir $@) -p
-	${QUIET}${CC} -c $< -o $@ ${CFLAGS}
+# ${OBJS}:${SRCS}
+# 	@echo "\033[32;35m[Compiling]\033[0m $@"
+# 	${QUIET}${CC} -c $< -o $@ ${CFLAGS} $(INC)
+
+# clean:
+# 	@echo "\033[0;31m[cleaning]\033[0m ${TARGET}"
+# 	rm -rf ${TARGET}
+# 	@echo "\033[0;31m[cleaning]\033[0m ${OBJS}"
+# 	rm -rf ${OBJS}
+$(TARGET):$(OBJS)
+	@echo "\033[32;32m[Linking]\033[0m $@"
+	${QUIET}${CC} $^ -o $@ ${CFLAGS}
 
 clean:
-	@echo "\033[0;31m<cleaning>\033[0m ${TARGET}"
+	@echo "\033[0;31m[cleaning]\033[0m ${TARGET}"
 	rm -rf ${TARGET}
-	@echo "\033[0;31m<cleaning>\033[0m ${OBJ}"
-	rm -rf ${TMP_PATH}
+	@echo "\033[0;31m[cleaning]\033[0m ${OBJS}"
+	rm -rf ${OBJS}
+
+%.o:%.c
+	@echo "\033[32;35m[Compiling]\033[0m $@"
+	${QUIET}${CC} $(CFLAGS) $(INC) -o $@ -c $<
