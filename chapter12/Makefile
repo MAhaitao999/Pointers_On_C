@@ -30,6 +30,7 @@ OBJS = $(SRCS:.c=.o)
 
 ###################################################################################################
 # 编译选项
+DEBUG_BUILD = yes
 CFLAGS := -fPIC -Wall -Werror
 ifeq ("${DEBUG_BUILD}","yes")
 CFLAGS += -g
